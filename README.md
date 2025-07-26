@@ -29,6 +29,7 @@ Music Root/
 - **🎧 High-Quality Conversion**: Converts to Opus format at 160kbps in stereo
 - **⚡ Multi-threaded**: Uses 4 concurrent threads for faster conversion
 - **🧹 Automatic Cleanup**: Removes original FLAC files and macOS metadata files (`._*`) after successful conversion
+- **🔄 Smart File Management**: Detects existing Opus files and offers to delete corresponding FLAC files
 - **📊 Disk Space Monitoring**: Shows disk usage before and after conversions
 - **🔄 Continuous Workflow**: Option to convert additional albums in the same session
 - **⚠️ Error Handling**: Keeps original files if any conversion fails
@@ -118,18 +119,28 @@ STARTING CONVERSION PROCESS
 ============================================================
 
 [1/2] Processing: A/Artist Name - [2023] Album Name
-Converting 12 FLAC files to Opus...
-  ✓ Converted: 01-Track.flac
-  ✓ Converted: 02-Track.flac
-  ...
-  Results: 12 converted, 0 failed, 0 skipped
-  Deleting original FLAC files...
+  Found 3 FLAC files with existing Opus versions
+  Delete these FLAC files? (Y/n): 
     Deleted: 01-Track.flac
     Deleted: 02-Track.flac
+    Deleted: 03-Track.flac
+    Cleaning up macOS metadata files...
+      Deleted: ._01-Track.flac
+      Deleted: ._02-Track.flac
+      Deleted: ._03-Track.flac
+Converting 12 FLAC files to Opus...
+  Skipping 04-Track.flac (Opus version exists)
+  ✓ Converted: 05-Track.flac
+  ✓ Converted: 06-Track.flac
+  ...
+  Results: 8 converted, 0 failed, 4 skipped
+  Deleting original FLAC files...
+    Deleted: 05-Track.flac
+    Deleted: 06-Track.flac
     ...
   Cleaning up macOS metadata files...
-    Deleted: ._01-Track.flac
-    Deleted: ._02-Track.flac
+    Deleted: ._05-Track.flac
+    Deleted: ._06-Track.flac
 
 ============================================================
 CONVERSION COMPLETE
@@ -154,6 +165,7 @@ Would you like to convert more albums? (Y/n): n
 
 ### File Management
 - **Safety**: Original FLAC files are only deleted after successful conversion
+- **Smart Detection**: Automatically detects existing Opus files and offers to clean up corresponding FLAC files
 - **Cleanup**: Automatically removes macOS metadata files (`._*` pattern)
 - **Error Handling**: If any file fails to convert, all FLAC files in that album are preserved
 

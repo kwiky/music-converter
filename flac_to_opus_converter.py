@@ -210,12 +210,64 @@ class FlacToOpusConverter:
             print(f"Unexpected error converting {flac_path.name}: {e}")
             return False
     
+    def handle_existing_opus_files(self, album: Dict[str, any]) -> List[Path]:
+        """Handle FLAC files that already have corresponding Opus files."""
+        album_path = album['path']
+        flac_files = album['flac_files']
+        
+        # Find FLAC files that have corresponding Opus files
+        flac_with_opus = []
+        for flac_file in flac_files:
+            flac_path = album_path / flac_file
+            opus_file = flac_file.rsplit('.', 1)[0] + '.opus'
+            opus_path = album_path / opus_file
+            
+            if opus_path.exists():
+                flac_with_opus.append(flac_path)
+        
+        if flac_with_opus:
+            print(f"  Found {len(flac_with_opus)} FLAC files with existing Opus versions")
+            print(f"  Delete these FLAC files? (Y/n): ", end="")
+            try:
+                delete_choice = input().strip().lower()
+                if delete_choice not in ['n', 'no']:
+                    deleted_files = []
+                    for flac_path in flac_with_opus:
+                        try:
+                            flac_path.unlink()
+                            print(f"    Deleted: {flac_path.name}")
+                            deleted_files.append(flac_path)
+                        except Exception as e:
+                            print(f"    Error deleting {flac_path.name}: {e}")
+                    
+                    # Clean up macOS metadata files for deleted FLAC files
+                    if deleted_files:
+                        print("    Cleaning up macOS metadata files...")
+                        for flac_path in deleted_files:
+                            metadata_file = album_path / f"._{flac_path.name}"
+                            if metadata_file.exists():
+                                try:
+                                    metadata_file.unlink()
+                                    print(f"      Deleted: {metadata_file.name}")
+                                except Exception:
+                                    pass
+                    
+                    return deleted_files
+            except KeyboardInterrupt:
+                print("\nSkipping deletion.")
+        
+        return []
+
     def convert_album(self, album: Dict[str, any]) -> bool:
         """Convert all FLAC files in an album to Opus format."""
         album_path = album['path']
         flac_files = album['flac_files']
         
         print(f"\nProcessing: {album['relative_path']}")
+        
+        # Handle existing Opus files first
+        deleted_flac_files = self.handle_existing_opus_files(album)
+        
         print(f"Converting {len(flac_files)} FLAC files to Opus...")
         
         successful_conversions = []
