@@ -196,7 +196,6 @@ class FlacToOpusConverter:
             cmd = [
                 'opusenc',
                 '--bitrate', self.opus_bitrate,
-                '--downmix-mono',  # Will be ignored for stereo, enforces stereo for multi-channel
                 str(flac_path),
                 str(opus_path)
             ]
