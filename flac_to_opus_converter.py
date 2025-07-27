@@ -7,13 +7,14 @@ Scans music collection for albums containing FLAC files, allows selection, and c
 import os
 import subprocess
 import sys
+import argparse
 from pathlib import Path
 from typing import List, Dict, Set
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import shutil
 
 class FlacToOpusConverter:
-    def __init__(self, music_root: str = "/Volumes/Hiby R3/music"):
+    def __init__(self, music_root: str):
         self.music_root = Path(music_root)
         self.supported_formats = {'.flac'}
         self.opus_bitrate = '160k'
@@ -22,7 +23,7 @@ class FlacToOpusConverter:
         """Find all albums that contain FLAC files."""
         albums_with_flac = []
         
-        print("Scanning for albums with FLAC files...")
+        print(f"Scanning for albums with FLAC files in {self.music_root}")
         
         for root, dirs, files in os.walk(self.music_root):
             # Skip the root directory itself
@@ -402,8 +403,23 @@ class FlacToOpusConverter:
 
 def main():
     """Entry point for the script."""
+    parser = argparse.ArgumentParser(description='Convert FLAC files to Opus format')
+    parser.add_argument('music_root', help='Root directory containing music albums')
+    
+    args = parser.parse_args()
+    
+    # Validate the provided path
+    music_path = Path(args.music_root)
+    if not music_path.exists():
+        print(f"Error: Music directory '{args.music_root}' does not exist")
+        sys.exit(1)
+    
+    if not music_path.is_dir():
+        print(f"Error: '{args.music_root}' is not a directory")
+        sys.exit(1)
+    
     try:
-        converter = FlacToOpusConverter()
+        converter = FlacToOpusConverter(str(music_path.resolve()))
         converter.run()
     except KeyboardInterrupt:
         print("\n\nOperation cancelled by user.")

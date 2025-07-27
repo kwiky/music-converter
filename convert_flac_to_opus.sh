@@ -20,9 +20,9 @@ if ! command -v python3 &> /dev/null; then
     exit 1
 fi
 
-# Run the Python script
+# Run the Python script with current directory as music root
 echo "Starting FLAC to Opus conversion tool..."
-echo "Music directory: $(dirname "$SCRIPT_DIR")"
+echo "Music directory: $(pwd)"
 echo ""
 
-python3 "$PYTHON_SCRIPT" "$@"
+python3 "$PYTHON_SCRIPT" "$(pwd)" "$@"
